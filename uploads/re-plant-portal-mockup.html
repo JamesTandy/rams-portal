@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RE Plant Hire — Job Documents Portal</title>
+<style>
+  :root{
+    --navy:#0e1b2b;
+    --navy-2:#16283e;
+    --amber:#f5a623;
+    --amber-dark:#c9820e;
+    --hazard:#111111;
+    --paper:#f6f4ef;
+    --paper-2:#ffffff;
+    --ink:#141414;
+    --ink-soft:#5b6472;
+    --line:#dcd8cd;
+    --ok:#2e7d4f;
+    --ok-bg:#e7f3ec;
+    --warn:#b3421b;
+    --warn-bg:#fbe9e2;
+    --pending:#8a6d1f;
+    --pending-bg:#faf1da;
+    --radius:2px;
+    --mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --disp: 'Barlow Condensed', 'Inter', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    font-family:var(--sans);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  @font-face{font-family:'Inter';src:local('Inter');}
+
+  /* ===== hazard stripe utility ===== */
+  .hazard-strip{
+    height:6px;
+    background:repeating-linear-gradient(135deg, var(--hazard), var(--hazard) 10px, var(--amber) 10px, var(--amber) 20px);
+  }
+
+  /* ===== top bar ===== */
+  .topbar{
+    background:var(--navy);
+    color:#fff;
+    padding:0 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    height:58px;
+    position:sticky;
+    top:0;
+    z-index:50;
+    border-bottom:3px solid var(--amber);
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:var(--disp);
+    letter-spacing:0.03em;
+  }
+  .brand-mark{
+    width:30px;height:30px;
+    background:var(--amber);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;color:var(--navy);
+    font-family:var(--sans);
+    font-size:13px;
+    flex-shrink:0;
+  }
+  .brand-name{font-size:19px;font-weight:600;text-transform:uppercase;}
+  .brand-sub{font-size:10px;color:#9fb0c3;text-transform:uppercase;letter-spacing:0.12em;margin-top:-2px;}
+
+  .role-switch{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    font-size:12px;
+  }
+  .role-pill-group{
+    display:flex;
+    background:rgba(255,255,255,0.08);
+    border-radius:20px;
+    padding:3px;
+    gap:2px;
+  }
+  .role-pill{
+    padding:6px 14px;
+    border-radius:18px;
+    font-size:12px;
+    font-weight:600;
+    color:#c7d2de;
+    cursor:pointer;
+    border:none;
+    background:transparent;
+    font-family:var(--sans);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    transition:all .15s;
+  }
+  .role-pill.active{
+    background:var(--amber);
+    color:var(--navy);
+  }
+  .user-tag{color:#9fb0c3;font-size:12px;}
+  .user-tag b{color:#fff;}
+
+  /* ===== layout ===== */
+  .app{
+    display:flex;
+    min-height:calc(100vh - 61px);
+  }
+  .sidebar{
+    width:220px;
+    background:var(--navy-2);
+    color:#cfd9e4;
+    flex-shrink:0;
+    padding:18px 0;
+    display:flex;
+    flex-direction:column;
+  }
+  .side-section{padding:0 18px;margin-bottom:22px;}
+  .side-label{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    color:#5f7185;
+    margin-bottom:8px;
+    font-weight:700;
+  }
+  .side-link{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:9px 18px;
+    font-size:13.5px;
+    color:#cfd9e4;
+    cursor:pointer;
+    border-left:3px solid transparent;
+    font-weight:500;
+  }
+  .side-link:hover{background:rgba(255,255,255,0.04);}
+  .side-link.active{
+    background:rgba(245,166,35,0.1);
+    border-left-color:var(--amber);
+    color:#fff;
+    font-weight:700;
+  }
+  .side-count{
+    margin-left:auto;
+    background:var(--amber);
+    color:var(--navy);
+    font-size:10.5px;
+    font-weight:800;
+    padding:1px 7px;
+    border-radius:10px;
+  }
+  .side-count.zero{background:rgba(255,255,255,0.12);color:#9fb0c3;}
+
+  .main{
+    flex:1;
+    padding:26px 32px 60px;
+    max-width:1180px;
+  }
+
+  .page-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+    gap:14px;
+  }
+  .page-eyebrow{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    color:var(--amber-dark);
+    font-weight:800;
+    margin-bottom:4px;
+  }
+  h1{
+    font-family:var(--disp);
+    font-weight:700;
+    font-size:34px;
+    margin:0;
+    color:var(--navy);
+    letter-spacing:0.01em;
+  }
+  .btn{
+    font-family:var(--sans);
+    font-weight:700;
+    font-size:13px;
+    padding:11px 20px;
+    border-radius:var(--radius);
+    border:2px solid var(--navy);
+    background:var(--navy);
+    color:#fff;
+    cursor:pointer;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+  }
+  .btn:hover{background:var(--navy-2);}
+  .btn.amber{
+    background:var(--amber);
+    border-color:var(--amber-dark);
+    color:var(--navy);
+  }
+  .btn.amber:hover{background:var(--amber-dark);color:#fff;}
+  .btn.ghost{
+    background:transparent;
+    border-color:var(--line);
+    color:var(--ink);
+  }
+  .btn.ghost:hover{border-color:var(--navy);}
+  .btn.full{width:100%;}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+  /* ===== cards / table ===== */
+  .card{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+  .job-list{display:flex;flex-direction:column;gap:10px;}
+  .job-row{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:16px 18px;
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-left:5px solid var(--line);
+    border-radius:var(--radius);
+    cursor:pointer;
+    transition:border-color .12s, transform .08s;
+  }
+  .job-row:hover{border-color:#c7c1b1;transform:translateX(2px);}
+  .job-row.status-pending{border-left-color:var(--pending);}
+  .job-row.status-partial{border-left-color:var(--amber-dark);}
+  .job-row.status-signed{border-left-color:var(--ok);}
+  .job-row.status-draft{border-left-color:#9aa4b1;}
+
+  .job-id{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--ink-soft);
+    background:var(--paper);
+    border:1px solid var(--line);
+    padding:3px 7px;
+    border-radius:2px;
+    flex-shrink:0;
+  }
+  .job-main{flex:1;min-width:0;}
+  .job-title{font-weight:700;font-size:15px;color:var(--ink);margin-bottom:2px;}
+  .job-meta{font-size:12.5px;color:var(--ink-soft);}
+  .job-meta span{margin-right:14px;}
+  .status-badge{
+    font-size:10.5px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    padding:5px 10px;
+    border-radius:20px;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+  .status-badge.pending{background:var(--pending-bg);color:var(--pending);}
+  .status-badge.partial{background:#fdf1de;color:var(--amber-dark);}
+  .status-badge.signed{background:var(--ok-bg);color:var(--ok);}
+  .status-badge.draft{background:#eef0f2;color:#6b7280;}
+  .chev{color:#b7c2cd;font-size:20px;flex-shrink:0;}
+
+  /* ===== detail / doc viewer ===== */
+  .doc-wrap{display:flex;gap:24px;align-items:flex-start;}
+  .doc-sheet{
+    flex:1;
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    padding:36px 40px;
+    min-height:400px;
+  }
+  .doc-kicker{
+    display:flex;
+    justify-content:space-between;
+    border-bottom:3px solid var(--navy);
+    padding-bottom:14px;
+    margin-bottom:22px;
+  }
+  .doc-kicker-left b{font-family:var(--disp);font-size:22px;color:var(--navy);text-transform:uppercase;}
+  .doc-kicker-left div{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+  .doc-ref{font-family:var(--mono);font-size:12px;text-align:right;color:var(--ink-soft);}
+  .doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 30px;margin-bottom:24px;}
+  .doc-field label{
+    display:block;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--ink-soft);
+    font-weight:700;
+    margin-bottom:3px;
+  }
+  .doc-field div.val{font-size:14px;color:var(--ink);font-weight:600;}
+  .doc-section-title{
+    font-family:var(--disp);
+    font-size:18px;
+    text-transform:uppercase;
+    color:var(--navy);
+    border-bottom:1px solid var(--line);
+    padding-bottom:6px;
+    margin:26px 0 12px;
+    letter-spacing:0.02em;
+  }
+  .risk-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:6px;}
+  .risk-table th{
+    text-align:left;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--ink-soft);
+    border-bottom:2px solid var(--line);
+    padding:6px 8px;
+  }
+  .risk-table td{
+    padding:8px 8px;
+    border-bottom:1px solid #ece9e1;
+    vertical-align:top;
+  }
+  .risk-level{
+    font-size:10.5px;
+    font-weight:800;
+    padding:2px 8px;
+    border-radius:12px;
+    white-space:nowrap;
+  }
+  .risk-level.high{background:var(--warn-bg);color:var(--warn);}
+  .risk-level.med{background:var(--pending-bg);color:var(--pending);}
+  .risk-level.low{background:var(--ok-bg);color:var(--ok);}
+
+  .liftplan-diagram{
+    background:var(--paper);
+    border:1px dashed #b7b0a0;
+    border-radius:2px;
+    padding:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--ink-soft);
+    font-size:12.5px;
+    margin-bottom:6px;
+    min-height:160px;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  /* ===== signature area ===== */
+  .sig-block{
+    margin-top:8px;
+    border:1px solid var(--line);
+    padding:16px;
+    background:var(--paper);
+    border-radius:2px;
+  }
+  .sig-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 4px;
+    border-bottom:1px solid #e8e4d9;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .sig-row:last-child{border-bottom:none;}
+  .sig-person{display:flex;align-items:center;gap:10px;min-width:0;}
+  .sig-avatar{
+    width:32px;height:32px;
+    border-radius:50%;
+    background:var(--navy);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:800;
+    flex-shrink:0;
+  }
+  .sig-name{font-weight:700;font-size:13.5px;}
+  .sig-role{font-size:11.5px;color:var(--ink-soft);}
+  .sig-status{
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+    padding:4px 10px;
+    border-radius:20px;
+    flex-shrink:0;
+  }
+  .sig-status.waiting{background:var(--pending-bg);color:var(--pending);}
+  .sig-status.done{background:var(--ok-bg);color:var(--ok);}
+  .sig-img{
+    font-family:'Brush Script MT', cursive;
+    font-size:22px;
+    color:var(--navy);
+  }
+
+  /* signing panel */
+  .side-panel{
+    width:320px;
+    flex-shrink:0;
+    position:sticky;
+    top:78px;
+  }
+  .panel-title{
+    font-family:var(--disp);
+    font-size:16px;
+    text-transform:uppercase;
+    color:var(--navy);
+    margin-bottom:10px;
+    letter-spacing:0.02em;
+  }
+  .canvas-wrap{
+    background:#fff;
+    border:2px solid var(--navy);
+    border-radius:2px;
+    height:150px;
+    position:relative;
+    cursor:crosshair;
+    overflow:hidden;
+    touch-action:none;
+  }
+  .canvas-wrap .placeholder{
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    color:#c2c8d0;
+    font-size:13px;
+    pointer-events:none;
+    font-style:italic;
+  }
+  canvas{width:100%;height:100%;display:block;}
+  .canvas-actions{display:flex;gap:8px;margin-top:10px;}
+  .field-mini label{
+    display:block;font-size:11px;font-weight:700;
+    text-transform:uppercase;letter-spacing:0.05em;
+    color:var(--ink-soft);margin:14px 0 5px;
+  }
+  select, input[type=text]{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:2px;
+    font-family:var(--sans);
+    font-size:13.5px;
+    background:#fff;
+  }
+  .toast{
+    margin-top:14px;
+    padding:10px 12px;
+    background:var(--ok-bg);
+    color:var(--ok);
+    font-size:12.5px;
+    font-weight:700;
+    border-radius:2px;
+    display:none;
+  }
+  .toast.show{display:block;}
+
+  .confirm-row{
+    display:flex;align-items:flex-start;gap:8px;
+    font-size:12px;color:var(--ink-soft);
+    margin-top:12px;
+    line-height:1.4;
+  }
+  .confirm-row input{margin-top:2px;}
+
+  .locked-banner{
+    background:var(--navy);
+    color:#fff;
+    padding:10px 16px;
+    font-size:12.5px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:18px;
+    border-radius:2px;
+  }
+  .locked-banner .dot{width:7px;height:7px;background:var(--ok);border-radius:50%;flex-shrink:0;}
+
+  .breadcrumb{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+    cursor:pointer;
+  }
+  .breadcrumb:hover{color:var(--navy);}
+
+  .send-log{font-size:12px;color:var(--ink-soft);margin-top:16px;border-top:1px dashed var(--line);padding-top:12px;}
+  .send-log div{margin-bottom:4px;display:flex;gap:6px;align-items:center;}
+  .send-log .tick{color:var(--ok);font-weight:800;}
+
+  /* builder form (office create) */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;}
+  .form-grid .full{grid-column:1/-1;}
+  .flabel{
+    font-size:11px;font-weight:700;text-transform:uppercase;
+    letter-spacing:0.05em;color:var(--ink-soft);margin-bottom:6px;display:block;
+  }
+  textarea{
+    width:100%;padding:9px 10px;border:1px solid var(--line);
+    border-radius:2px;font-family:var(--sans);font-size:13.5px;resize:vertical;min-height:70px;
+  }
+  .hazard-row{
+    display:grid;grid-template-columns:2fr 1fr 2fr 90px;gap:10px;
+    align-items:center;margin-bottom:8px;
+  }
+  .hazard-row input, .hazard-row select{font-size:13px;padding:7px 9px;}
+  .add-hazard{font-size:12.5px;color:var(--amber-dark);font-weight:700;cursor:pointer;margin-top:4px;}
+
+  .empty-state{
+    text-align:center;padding:70px 20px;color:var(--ink-soft);
+  }
+  .empty-state .icon{font-size:40px;margin-bottom:10px;}
+
+  @media (max-width: 900px){
+    .sidebar{display:none;}
+    .doc-wrap{flex-direction:column;}
+    .side-panel{width:100%;position:static;}
+    .form-grid{grid-template-columns:1fr;}
+    .main{padding:18px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark">RE</div>
+    <div>
+      <div class="brand-name">RE Plant Hire</div>
+      <div class="brand-sub">Job Documents Portal — Mockup</div>
+    </div>
+  </div>
+  <div class="role-switch">
+    <div class="role-pill-group" id="roleGroup">
+      <button class="role-pill active" data-role="office">Office</button>
+      <button class="role-pill" data-role="driver">Driver</button>
+      <button class="role-pill" data-role="customer">Customer</button>
+    </div>
+    <div class="user-tag" id="userTag">Signed in as <b>Martin S.</b></div>
+  </div>
+</div>
+
+<div class="app">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="main" id="main"></div>
+</div>
+
+<script>
+/* ============ DEMO DATA (in-memory only) ============ */
+
+let state = {
+  role: 'office',
+  view: 'jobs',       // jobs | newdoc | detail
+  activeJobId: null,
+  sigStep: 0,         // index of next signer in the sign-on-glass flow
+};
+
+const jobs = [
+  {
+    id: 'L098-0714',
+    site: 'Redrow — Coed Darcy Phase 3',
+    address: 'Coed Darcy, Neath Port Talbot, SA10 7FE',
+    vehicle: 'L098 — Scania R450 / Fassi F660RA.2.26',
+    driver: 'Rhys Cook',
+    customer: 'Redrow Homes South Wales',
+    customerEmail: 'siteops@redrow.co.uk',
+    date: '02 Jul 2026',
+    docType: 'RAMS + Lift Plan',
+    status: 'pending',    // draft | pending | partial | signed
+    hazards: [
+      { desc: 'Overhead power lines adjacent to lift zone', level: 'high', control: 'Min 15m exclusion zone, banksman to confirm clearance before each lift' },
+      { desc: 'Uneven ground / recent groundworks', level: 'med', control: 'Outriggers on load-spreading mats, min 600mm x 600mm' },
+      { desc: 'Site traffic — delivery wagons on same access road', level: 'med', control: 'Banksman controls access road during lift operations' },
+      { desc: 'Manual handling of timber frame sections', level: 'low', control: 'Two-person lift for sections over 25kg' },
+    ],
+    liftplan: 'Fassi F660RA.2.26, max radius 8.2m, load 2,650kg — L414 fly jib fitted for extended reach over foundation line.',
+    signers: [
+      { name: 'Rhys Cook', role: 'HIAB Operator', status: 'waiting' },
+      { name: 'Dave Meredith', role: 'Banksman', status: 'waiting' },
+      { name: 'Site Contact — Redrow', role: 'Principal Contractor Rep', status: 'waiting' },
+    ],
+  },
+  {
+    id: 'L103-0715',
+    site: 'Barratt Homes — Llanilid West',
+    address: 'Llanilid, Pencoed, CF35 6HA',
+    vehicle: 'L103 — Fassi F485A.2.26',
+    driver: 'Mike Tandy',
+    customer: 'Barratt Homes',
+    customerEmail: 'commercial@barratthomes.co.uk',
+    date: '01 Jul 2026',
+    docType: 'RAMS',
+    status: 'partial',
+    hazards: [
+      { desc: 'Confined access via single site entrance', level: 'med', control: 'Swept path assessment completed, banksman on entrance' },
+      { desc: 'Roof truss lift near occupied plots', level: 'high', control: 'Exclusion zone taped, adjacent plots notified 24hrs prior' },
+    ],
+    liftplan: 'Fassi F485A.2.26, max radius 6.5m, load 1,850kg.',
+    signers: [
+      { name: 'Mike Tandy', role: 'HIAB Operator', status: 'done', signedAt: '01 Jul 2026, 07:14', sig: 'M Tandy' },
+      { name: 'Site Foreman — Barratt', role: 'Principal Contractor Rep', status: 'waiting' },
+    ],
+  },
+  {
+    id: 'L104-0710',
+    site: 'Welsh Water — Bryncethin WTW',
+    address: 'Bryncethin Treatment Works, Bridgend, CF32 9YN',
+    vehicle: 'L104',
+    driver: 'Rhys Cook',
+    customer: 'Welsh Water',
+    customerEmail: 'projectdelivery@dwrcymru.com',
+    date: '28 Jun 2026',
+    docType: 'RAMS — IBC / Folic Acid Lift',
+    status: 'signed',
+    hazards: [
+      { desc: 'Handling of chemical IBCs (folic acid solution)', level: 'high', control: 'Certified lifting chains rated for IBC frame, spill kit on vehicle, PPE per COSHH sheet' },
+      { desc: 'Confined plant room access route', level: 'med', control: 'Pre-lift site walk with WW ops team, banksman throughout' },
+    ],
+    liftplan: 'Fassi crane, max radius 4.0m, load 1,200kg — vertical lift only, no slew over live plant.',
+    signers: [
+      { name: 'Rhys Cook', role: 'HIAB Operator', status: 'done', signedAt: '28 Jun 2026, 08:02', sig: 'R Cook' },
+      { name: 'Dave Meredith', role: 'Banksman', status: 'done', signedAt: '28 Jun 2026, 08:05', sig: 'D Meredith' },
+      { name: 'J. Pryce — Welsh Water', role: 'Principal Contractor Rep', status: 'done', signedAt: '28 Jun 2026, 08:11', sig: 'J Pryce' },
+    ],
+    officeReceived: '28 Jun 2026, 08:12',
+    customerSent: '28 Jun 2026, 08:12',
+  },
+  {
+    id: 'L105-0716',
+    site: 'David Wilson Homes — Parc Panteg',
+    address: 'Griffithstown, Pontypool, NP4 5JJ',
+    vehicle: 'L105',
+    driver: 'Unassigned',
+    customer: 'David Wilson Homes',
+    customerEmail: 'sitesupport@dwh.co.uk',
+    date: '04 Jul 2026',
+    docType: 'RAMS + Lift Plan',
+    status: 'draft',
+    hazards: [],
+    liftplan: '',
+    signers: [],
+  },
+];
+
+const currentUserByRole = {
+  office: 'Martin S.',
+  driver: 'Rhys Cook',
+  customer: 'Redrow Homes (view-only)',
+};
+
+/* ============ RENDER ============ */
+
+function statusLabel(s){
+  return {draft:'Draft', pending:'Awaiting signatures', partial:'Partially signed', signed:'Fully signed'}[s];
+}
+
+function initials(name){
+  return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+}
+
+function render(){
+  renderSidebar();
+  renderMain();
+  document.getElementById('userTag').innerHTML = 'Signed in as <b>' + currentUserByRole[state.role] + '</b>';
+  document.querySelectorAll('.role-pill').forEach(p=>{
+    p.classList.toggle('active', p.dataset.role === state.role);
+  });
+}
+
+function renderSidebar(){
+  const sb = document.getElementById('sidebar');
+  const myJobs = jobsForRole();
+  const counts = {
+    all: myJobs.length,
+    pending: myJobs.filter(j=>j.status==='pending'||j.status==='partial').length,
+    signed: myJobs.filter(j=>j.status==='signed').length,
+    draft: myJobs.filter(j=>j.status==='draft').length,
+  };
+
+  let html = '';
+
+  if(state.role === 'office'){
+    html += `
+      <div class="side-section">
+        <div class="side-label">Documents</div>
+        <div class="side-link ${state.view==='jobs'?'active':''}" onclick="goJobs()">All jobs <span class="side-count ${counts.all?'':'zero'}">${counts.all}</span></div>
+        <div class="side-link" onclick="goJobs()">Awaiting signatures <span class="side-count ${counts.pending?'':'zero'}">${counts.pending}</span></div>
+        <div class="side-link" onclick="goJobs()">Fully signed <span class="side-count ${counts.signed?'':'zero'}">${counts.signed}</span></div>
+        <div class="side-link" onclick="goJobs()">Drafts <span class="side-count ${counts.draft?'':'zero'}">${counts.draft}</span></div>
+      </div>
+      <div class="side-section">
+        <div class="side-label">Create</div>
+        <div class="side-link ${state.view==='newdoc'?'active':''}" onclick="goNewDoc()">+ New RAMS / Lift Plan</div>
+      </div>
+      <div class="side-section">
+        <div class="side-label">Records</div>
+        <div class="side-link" onclick="goJobs()">Sites &amp; customers</div>
+        <div class="side-link" onclick="goJobs()">Fleet</div>
+      </div>`;
+  } else if(state.role === 'driver'){
+    html += `
+      <div class="side-section">
+        <div class="side-label">My jobs</div>
+        <div class="side-link active" onclick="goJobs()">Assigned to me <span class="side-count ${counts.all?'':'zero'}">${counts.all}</span></div>
+        <div class="side-link" onclick="goJobs()">Needs my signature <span class="side-count ${counts.pending?'':'zero'}">${counts.pending}</span></div>
+        <div class="side-link" onclick="goJobs()">Signed record <span class="side-count ${counts.signed?'':'zero'}">${counts.signed}</span></div>
+      </div>`;
+  } else {
+    html += `
+      <div class="side-section">
+        <div class="side-label">Your site documents</div>
+        <div class="side-link active" onclick="goJobs()">All received <span class="side-count ${counts.all?'':'zero'}">${counts.all}</span></div>
+      </div>`;
+  }
+
+  sb.innerHTML = html;
+}
+
+function jobsForRole(){
+  if(state.role === 'driver') return jobs.filter(j => j.driver === currentUserByRole.driver);
+  if(state.role === 'customer') return jobs.filter(j => j.status === 'signed');
+  return jobs;
+}
+
+function goJobs(){ state.view='jobs'; state.activeJobId=null; render(); }
+function goNewDoc(){ state.view='newdoc'; render(); }
+function openJob(id){ state.activeJobId=id; state.view='detail'; state.sigStep=0; render(); window.scrollTo(0,0); }
+
+function renderMain(){
+  const main = document.getElementById('main');
+  if(state.view === 'jobs') main.innerHTML = jobsListView();
+  else if(state.view === 'newdoc') main.innerHTML = newDocView();
+  else if(state.view === 'detail') main.innerHTML = detailView();
+
+  if(state.view === 'detail'){
+    const job = jobs.find(j=>j.id===state.activeJobId);
+    if(job && state.role==='driver' && nextSignerFor(job)) setupCanvas();
+  }
+}
+
+/* ---- jobs list ---- */
+function jobsListView(){
+  const myJobs = jobsForRole();
+  const heading = {
+    office: ['Job Documents', 'RAMS and lift plans across all live sites'],
+    driver: ['My Assigned Jobs', 'Documents requiring your review and signature'],
+    customer: ['Site Documents', 'Signed RAMS and lift plans for your sites'],
+  }[state.role];
+
+  if(myJobs.length === 0){
+    return `
+      <div class="page-head"><div><div class="page-eyebrow">Portal</div><h1>${heading[0]}</h1></div></div>
+      <div class="empty-state"><div class="icon">📋</div><div><b>Nothing here yet.</b><br>${heading[1]}</div></div>`;
+  }
+
+  const rows = myJobs.map(j=>{
+    const outstanding = j.signers.filter(s=>s.status==='waiting').length;
+    let metaSign = '';
+    if(j.status !== 'draft'){
+      metaSign = `<span>✍️ ${j.signers.length - outstanding}/${j.signers.length} signed</span>`;
+    }
+    return `
+    <div class="job-row status-${j.status}" onclick="openJob('${j.id}')">
+      <div class="job-id">${j.id}</div>
+      <div class="job-main">
+        <div class="job-title">${j.site}</div>
+        <div class="job-meta">
+          <span>📅 ${j.date}</span>
+          <span>🚛 ${j.vehicle}</span>
+          <span>📄 ${j.docType}</span>
+          ${metaSign}
+        </div>
+      </div>
+      <div class="status-badge ${j.status}">${statusLabel(j.status)}</div>
+      <div class="chev">›</div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="page-head">
+      <div><div class="page-eyebrow">Portal</div><h1>${heading[0]}</h1></div>
+      ${state.role==='office' ? '<button class="btn amber" onclick="goNewDoc()">+ New RAMS / Lift Plan</button>' : ''}
+    </div>
+    <div class="job-list">${rows}</div>
+  `;
+}
+
+/* ---- new doc builder (office) ---- */
+function newDocView(){
+  return `
+    <div class="breadcrumb" onclick="goJobs()">← Back to all jobs</div>
+    <div class="page-head"><div><div class="page-eyebrow">New document</div><h1>Create RAMS &amp; Lift Plan</h1></div></div>
+
+    <div class="card" style="padding:26px;">
+      <div class="doc-section-title" style="margin-top:0;">Job details</div>
+      <div class="form-grid">
+        <div><span class="flabel">Site / job name</span><input type="text" value="Charles Church — Fairwater Green" /></div>
+        <div><span class="flabel">Customer</span><input type="text" value="Charles Church" /></div>
+        <div><span class="flabel">Site address</span><input type="text" value="Fairwater, Cwmbran, NP44 4XT" /></div>
+        <div><span class="flabel">Vehicle</span>
+          <select>
+            <option>L098 — Scania R450 / Fassi F660RA.2.26</option>
+            <option>L103 — Fassi F485A.2.26</option>
+            <option>L104</option>
+            <option>L105</option>
+          </select>
+        </div>
+        <div><span class="flabel">Assign driver</span>
+          <select>
+            <option>Rhys Cook</option>
+            <option>Mike Tandy</option>
+            <option>Unassigned</option>
+          </select>
+        </div>
+        <div><span class="flabel">Job date</span><input type="text" value="04 Jul 2026" /></div>
+      </div>
+
+      <div class="doc-section-title">Risk assessment</div>
+      <div class="hazard-row" style="font-size:10.5px;text-transform:uppercase;color:var(--ink-soft);font-weight:700;">
+        <div>Hazard</div><div>Risk level</div><div>Control measure</div><div></div>
+      </div>
+      <div class="hazard-row">
+        <input type="text" value="Overhead power lines" />
+        <select><option>High</option><option>Medium</option><option>Low</option></select>
+        <input type="text" value="15m exclusion zone, banksman confirms clearance" />
+        <button class="btn ghost" style="padding:7px;font-size:11px;">Remove</button>
+      </div>
+      <div class="hazard-row">
+        <input type="text" value="Uneven ground" />
+        <select><option>Medium</option><option>High</option><option>Low</option></select>
+        <input type="text" value="Outriggers on load-spreading mats" />
+        <button class="btn ghost" style="padding:7px;font-size:11px;">Remove</button>
+      </div>
+      <div class="add-hazard" onclick="alert('Mockup only — this would add another hazard row.')">+ Add hazard row</div>
+
+      <div class="doc-section-title">Lift plan</div>
+      <div class="form-grid">
+        <div><span class="flabel">Max radius</span><input type="text" value="7.5m" /></div>
+        <div><span class="flabel">Max load at radius</span><input type="text" value="2,100kg" /></div>
+        <div class="full"><span class="flabel">Lift plan notes</span><textarea>Vertical lift over foundation line, outriggers on mats at full extension. No overhead obstructions within working radius.</textarea></div>
+      </div>
+
+      <div class="doc-section-title">Sign-off required from</div>
+      <div class="form-grid">
+        <div><span class="flabel">Operator</span><input type="text" value="Rhys Cook" /></div>
+        <div><span class="flabel">Banksman</span><input type="text" value="Dave Meredith" /></div>
+        <div><span class="flabel">Principal contractor rep</span><input type="text" value="Site foreman — Charles Church" /></div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:26px;">
+        <button class="btn ghost" onclick="goJobs()">Save as draft</button>
+        <button class="btn amber" onclick="alert('Mockup only — this would publish the document to the assigned driver\\'s login for sign-on-glass.'); goJobs();">Publish &amp; send to driver</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ---- detail / sign view ---- */
+function nextSignerFor(job){
+  return job.signers.find(s=>s.status==='waiting');
+}
+
+function detailView(){
+  const job = jobs.find(j=>j.id===state.activeJobId);
+  if(!job) return '';
+
+  const hazardRows = job.hazards.map(h=>`
+    <tr>
+      <td>${h.desc}</td>
+      <td><span class="risk-level ${h.level}">${h.level.toUpperCase()}</span></td>
+      <td>${h.control}</td>
+    </tr>`).join('') || '<tr><td colspan="3" style="color:var(--ink-soft);">No hazards recorded yet.</td></tr>';
+
+  const sigRows = job.signers.map(s=>`
+    <div class="sig-row">
+      <div class="sig-person">
+        <div class="sig-avatar">${initials(s.name)}</div>
+        <div>
+          <div class="sig-name">${s.name}</div>
+          <div class="sig-role">${s.role}${s.status==='done' ? ' · ' + s.signedAt : ''}</div>
+        </div>
+      </div>
+      ${s.status==='done'
+        ? `<div class="sig-img">${s.sig}</div>`
+        : `<div class="sig-status waiting">Awaiting</div>`}
+    </div>`).join('') || '<div style="color:var(--ink-soft);font-size:13px;padding:8px 4px;">No signers assigned.</div>';
+
+  let sendLog = '';
+  if(job.status === 'signed'){
+    sendLog = `
+      <div class="send-log">
+        <div><span class="tick">✓</span> Signed copy filed to office record — ${job.officeReceived}</div>
+        <div><span class="tick">✓</span> Emailed to ${job.customerEmail} — ${job.customerSent}</div>
+        <div><span class="tick">✓</span> Copy retained on driver's device for the job</div>
+      </div>`;
+  }
+
+  const lockedBanner = job.status === 'signed'
+    ? `<div class="locked-banner"><span class="dot"></span> Fully signed &amp; locked — this record cannot be edited</div>`
+    : '';
+
+  const docSheet = `
+    ${lockedBanner}
+    <div class="doc-wrap">
+      <div class="doc-sheet">
+        <div class="doc-kicker">
+          <div class="doc-kicker-left">
+            <b>${job.docType}</b>
+            <div>${job.site}</div>
+          </div>
+          <div class="doc-ref">Ref: ${job.id}<br>Job date: ${job.date}</div>
+        </div>
+
+        <div class="doc-grid">
+          <div class="doc-field"><label>Site address</label><div class="val">${job.address}</div></div>
+          <div class="doc-field"><label>Customer</label><div class="val">${job.customer}</div></div>
+          <div class="doc-field"><label>Vehicle</label><div class="val">${job.vehicle}</div></div>
+          <div class="doc-field"><label>Driver / operator</label><div class="val">${job.driver}</div></div>
+        </div>
+
+        <div class="doc-section-title">Risk assessment</div>
+        <table class="risk-table">
+          <thead><tr><th style="width:38%;">Hazard</th><th style="width:14%;">Risk</th><th>Control measure</th></tr></thead>
+          <tbody>${hazardRows}</tbody>
+        </table>
+
+        ${job.liftplan ? `
+        <div class="doc-section-title">Lift plan</div>
+        <div class="liftplan-diagram">
+          <div style="font-size:26px;">🏗️</div>
+          <div>${job.liftplan}</div>
+        </div>` : ''}
+
+        <div class="doc-section-title">Sign-off</div>
+        <div class="sig-block">${sigRows}</div>
+
+        ${sendLog}
+      </div>
+
+      ${signPanel(job)}
+    </div>
+  `;
+
+  return `
+    <div class="breadcrumb" onclick="goJobs()">← Back to ${state.role==='driver'?'my jobs':'all jobs'}</div>
+    <div class="page-head">
+      <div><div class="page-eyebrow">${job.id}</div><h1>${job.site}</h1></div>
+      ${state.role==='office' ? `<button class="btn ghost" onclick="alert('Mockup only — would resend notification to outstanding signers.')">Chase outstanding signatures</button>` : ''}
+    </div>
+    ${docSheet}
+  `;
+}
+
+function signPanel(job){
+  if(state.role !== 'driver'){
+    if(state.role === 'customer'){
+      return `
+        <div class="side-panel card" style="padding:18px;">
+          <div class="panel-title">Record status</div>
+          <p style="font-size:13px;color:var(--ink-soft);line-height:1.5;">This is a locked, fully-signed copy provided for your records. All parties listed have signed on-site prior to lift operations commencing.</p>
+          <button class="btn ghost full" onclick="alert('Mockup only — would download PDF.')">Download PDF</button>
+        </div>`;
+    }
+    return `
+      <div class="side-panel card" style="padding:18px;">
+        <div class="panel-title">Status</div>
+        <p style="font-size:13px;color:var(--ink-soft);line-height:1.5;">
+          ${job.status==='draft' ? 'Not yet published to driver.' : job.status==='signed' ? 'All required signatures collected. Record locked.' : 'Waiting on signatures from the driver and other parties on site.'}
+        </p>
+      </div>`;
+  }
+
+  const next = nextSignerFor(job);
+  if(!next){
+    return `
+      <div class="side-panel card" style="padding:18px;">
+        <div class="panel-title">Sign-off</div>
+        <p style="font-size:13px;color:var(--ink-soft);line-height:1.5;">All required signatures on this document have been collected. No action needed.</p>
+      </div>`;
+  }
+
+  return `
+    <div class="side-panel card" style="padding:18px;">
+      <div class="panel-title">Sign on glass</div>
+      <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 4px;">Next signature required from:</p>
+      <div class="field-mini" style="margin-top:2px;">
+        <div style="font-weight:700;font-size:14px;">${next.name}</div>
+        <div style="font-size:12px;color:var(--ink-soft);">${next.role}</div>
+      </div>
+
+      <div class="field-mini"><label>Sign below</label></div>
+      <div class="canvas-wrap" id="canvasWrap">
+        <div class="placeholder" id="canvasPlaceholder">Sign here with finger or stylus</div>
+        <canvas id="sigCanvas"></canvas>
+      </div>
+      <div class="canvas-actions">
+        <button class="btn ghost" style="flex:1;font-size:12px;padding:8px;" onclick="clearCanvas()">Clear</button>
+      </div>
+
+      <div class="confirm-row">
+        <input type="checkbox" id="confirmBox">
+        <label for="confirmBox">I confirm I have read and understood this RAMS and lift plan, and agree to work in accordance with the control measures stated.</label>
+      </div>
+
+      <button class="btn amber full" style="margin-top:14px;" onclick="submitSignature('${job.id}')">Confirm &amp; sign</button>
+      <div class="toast" id="signToast">Signature recorded and timestamped.</div>
+    </div>
+  `;
+}
+
+/* ---- canvas signing ---- */
+let drawing = false, ctx, hasSignature = false;
+function setupCanvas(){
+  const canvas = document.getElementById('sigCanvas');
+  if(!canvas) return;
+  const wrap = document.getElementById('canvasWrap');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = wrap.clientWidth * dpr;
+  canvas.height = wrap.clientHeight * dpr;
+  ctx = canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  ctx.strokeStyle = '#0e1b2b';
+  ctx.lineWidth = 2.4;
+  ctx.lineCap = 'round';
+  hasSignature = false;
+
+  const pos = (e)=>{
+    const r = canvas.getBoundingClientRect();
+    const p = e.touches ? e.touches[0] : e;
+    return {x: p.clientX - r.left, y: p.clientY - r.top};
+  };
+  const start = (e)=>{ drawing=true; hasSignature=true; document.getElementById('canvasPlaceholder').style.display='none'; const p=pos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); e.preventDefault(); };
+  const move = (e)=>{ if(!drawing) return; const p=pos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); e.preventDefault(); };
+  const end = ()=>{ drawing=false; };
+
+  canvas.onmousedown = start; canvas.onmousemove = move; window.addEventListener('mouseup', end);
+  canvas.ontouchstart = start; canvas.ontouchmove = move; canvas.ontouchend = end;
+}
+function clearCanvas(){
+  const canvas = document.getElementById('sigCanvas');
+  if(!canvas || !ctx) return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  hasSignature = false;
+  document.getElementById('canvasPlaceholder').style.display='flex';
+}
+function submitSignature(jobId){
+  const confirmed = document.getElementById('confirmBox').checked;
+  if(!hasSignature){ alert('Please sign in the box before confirming.'); return; }
+  if(!confirmed){ alert('Please tick the confirmation box to proceed.'); return; }
+
+  const job = jobs.find(j=>j.id===jobId);
+  const next = nextSignerFor(job);
+  next.status = 'done';
+  next.signedAt = new Date().toLocaleString('en-GB', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  next.sig = next.name.split(' ').map((w,i)=> i===0? w[0]+' ' : w).join('');
+
+  const stillWaiting = job.signers.some(s=>s.status==='waiting');
+  job.status = stillWaiting ? (job.signers.some(s=>s.status==='done') ? 'partial' : 'pending') : 'signed';
+  if(job.status === 'signed'){
+    const now = new Date().toLocaleString('en-GB', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    job.officeReceived = now;
+    job.customerSent = now;
+  }
+
+  document.getElementById('signToast').classList.add('show');
+  setTimeout(()=> render(), 700);
+}
+
+/* ---- role switching ---- */
+document.getElementById('roleGroup').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.role-pill');
+  if(!btn) return;
+  state.role = btn.dataset.role;
+  state.view = 'jobs';
+  state.activeJobId = null;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
